@@ -21,7 +21,6 @@ Execute Procedure:
 */
 
 
-
 CREATE OR ALTER PROCEDURE bronze_bulk_load AS
 BEGIN
 	DECLARE @start_time DATETIME, @end_time DATETIME, @batch_start_time DATETIME, @batch_end_time DATETIME;

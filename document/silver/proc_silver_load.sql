@@ -25,7 +25,6 @@ Execute Procedure:
 */
 
 
-
 CREATE OR ALTER PROCEDURE proc_silver_layer_loding AS
 
 BEGIN

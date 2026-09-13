@@ -14,10 +14,6 @@ Purpose:
     - Add dwh_create_date for audit and lineage tracking.
     - Ensure data quality with standardized column definitions.
     - Provide a foundation for Gold layer aggregation and analytics.
-
-Notes:
-    - All tables include aligned column formatting for readability.
-    - Default GETDATE() ensures automatic timestamping of records.
 */
 
 

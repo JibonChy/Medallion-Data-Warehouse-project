@@ -3,6 +3,11 @@
      Silver Layer DDL — CRM & ERP
 ===========================================
 
+Introduction:
+    This script defines the Silver layer tables for CRM and ERP data.
+    Silver is the cleaned and standardized zone where raw Bronze data
+    is transformed into consistent, reliable structures.
+
 Purpose:
     - Create CRM Silver tables (cust_info, prd_info, sales_details).
     - Create ERP Silver tables (cust_az12, loc_a101, px_cat_g1v2).

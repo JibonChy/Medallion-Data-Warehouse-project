@@ -15,7 +15,11 @@ Purpose:
     - Capture execution start/end timestamps for each table and batch.
     - Print total execution duration for CRM and ERP loads.
     - Provide error handling with detailed messages for debugging.
+
+Execute Procedure:
+    - EXEC bronze_bulk_load;
 */
+
 
 
 CREATE OR ALTER PROCEDURE bronze_bulk_load AS

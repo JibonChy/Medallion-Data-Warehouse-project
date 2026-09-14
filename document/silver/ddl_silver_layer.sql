@@ -100,6 +100,6 @@ CREATE TABLE silver.erp_px_cat_g1v2
     id                     NVARCHAR(45),
     cat                    NVARCHAR(45),
     subcat                 NVARCHAR(45),
-    maintainance            NVARCHAR(45),
+    maintenance            NVARCHAR(45),
     dwh_create_date        DATETIME2 DEFAULT GETDATE()
 );

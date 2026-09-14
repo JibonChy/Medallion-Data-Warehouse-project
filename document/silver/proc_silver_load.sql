@@ -97,8 +97,8 @@ BEGIN
 		)
 		SELECT
 			prd_id,
-			SUBSTRING(REPLACE(prd_key, '-', '_'), 1, 5) AS cat_id,
-			SUBSTRING(REPLACE(prd_key, '-', '_'),7, LEN(prd_key)) AS prd_key,
+			REPLACE(SUBSTRING(prd_key, 1, 5), '-', '_') AS cat_id,
+			SUBSTRING(prd_key, 7, LEN(prd_key)) AS prd_key,
 			prd_nm,
 			COALESCE(prd_cost, 0) AS prd_cost,
 			CASE prd_line
@@ -238,7 +238,7 @@ BEGIN
 			id,
 			cat,
 			subcat,
-			maintainance
+			maintenance
 		)
 		SELECT 
 			ID, 
@@ -271,3 +271,4 @@ BEGIN
 END;
 
 EXEC proc_silver_layer_loding;
+

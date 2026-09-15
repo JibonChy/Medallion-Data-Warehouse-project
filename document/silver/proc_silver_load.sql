@@ -36,7 +36,7 @@ BEGIN
 		PRINT '=======================================================';
 
 
-
+		-- Loading silver.crm_cust_info
 		SET @start_time = GETDATE();
 		PRINT '>>>Table Truncation: silver.crm_cust_info';
 		TRUNCATE TABLE silver.crm_cust_info;
@@ -71,15 +71,15 @@ BEGIN
 		(
 			SELECT 
 				*,
-				ROW_NUMBER() OVER (PARTITION BY cst_id ORDER BY cst_create_date DESC) AS chacking_duplicate
+				ROW_NUMBER() OVER (PARTITION BY cst_id ORDER BY cst_create_date DESC) AS chacking_duplicate_flag
 			FROM bronze.crm_cust_info
 		)t
-		WHERE chacking_duplicate = 1;
+		WHERE chacking_duplicate_flag = 1;
 		SET @end_time = GETDATE();
 		PRINT '>>>Total Execution Duration (seconds):' + CAST(DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR);
 
 
-
+		-- Loading silver.crm_prd_info
 		SET @start_time = GETDATE();
 		PRINT '>>>Table Truncation: silver.crm_prd_info';
 		TRUNCATE TABLE silver.crm_prd_info;
@@ -115,7 +115,7 @@ BEGIN
 		PRINT '>>>Total Execution Duration (seconds):' + CAST(DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR);
 
 
-
+		-- Loading crm_sales_details
 		SET @start_time = GETDATE();
 		PRINT '>>>Table Truncation: silver.crm_sales_details';
 		TRUNCATE TABLE silver.crm_sales_details;
@@ -148,8 +148,8 @@ BEGIN
 			sls_quantity,
 			CASE 
 				WHEN sls_price IS NULL OR sls_price <=0
-				THEN sls_sales / NULLIF(sls_quantity, 0)
-				ELSE ABS(sls_price)
+					THEN sls_sales / NULLIF(sls_quantity, 0)
+				ELSE sls_price
 			END AS sls_price
 		FROM bronze.crm_sales_details;
 		SET @end_time = GETDATE();
@@ -174,61 +174,57 @@ BEGIN
 		PRINT '>>> START: ERP Silver Layer Loading';
 		PRINT '=======================================================';
 
-
+		-- Loading erp_cust_az12
 		SET @start_time = GETDATE();
 		PRINT '>>>Table Truncation: silver.erp_cust_az12';
 		TRUNCATE TABLE silver.erp_cust_az12;
 		PRINT '>>>Data Insertion Process: silver.erp_cust_az12';
 		INSERT INTO silver.erp_cust_az12 
 		(
-			CID,
-			BDATE,
-			GEN
+			cid,
+			bdate,
+			gen
 		)
 		SELECT 
 			CASE 
-				WHEN CID LIKE 'NAS%' THEN SUBSTRING(CID, 4, LEN(CID))
-				ELSE CID
-			END AS CID,
-			BDATE AS BDATE,
-			CASE 
-				WHEN GEN = 'F' THEN 'Female'
-				WHEN GEN = 'M' THEN 'Male'
-				WHEN GEN = '' THEN 'n/a'
-				WHEN GEN IS NULL THEN 'n/a'
-				ELSE GEN
-			END AS GEN
+				WHEN cid LIKE 'NAS%' THEN SUBSTRING(cid, 4, LEN(cid))
+				ELSE cid
+			END AS cid,
+			btate AS bdate,
+			CASE
+				WHEN UPPER(TRIM(gen)) IN ('F', 'FEMALE') THEN 'Female'
+				WHEN UPPER(TRIM(gen)) IN ('M', 'MALE') THEN 'Male'
+				ELSE 'n/a'
+			END AS gen
 		FROM bronze.erp_cust_az12;
 		SET @end_time = GETDATE();
 		PRINT '>>>Total Execution Duration (seconds):' + CAST(DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR);
 
 
-
+		-- Loading erp_loc_a101
 		SET @start_time = GETDATE();
 		PRINT '>>>Table Truncation: silver.erp_loc_a101';
 		TRUNCATE TABLE silver.erp_loc_a101;
 		PRINT '>>>Data Insertion Process: silver.erp_loc_a101';
 		INSERT INTO silver.erp_loc_a101
 		(
-			CID,
-			CNTRY
+			cid,
+			cntry
 		)
 		SELECT
-			REPLACE(CID, '-', '') AS CID,
-			CASE 
-				WHEN CNTRY = 'DE' THEN 'Germany'
-				WHEN CNTRY = 'USA' THEN 'United States'
-				WHEN CNTRY = 'US' THEN 'United States'
-				WHEN CNTRY = '' THEN 'n/a'
-				WHEN CNTRY IS NULL THEN 'n/a'
-				ELSE CNTRY
-			END AS CNTRY
+			REPLACE(cid, '-', '') AS cid,
+			CASE
+				WHEN TRIM(cntry) = 'DE' THEN 'Germany'
+				WHEN TRIM(cntry) IN ('US', 'USA') THEN 'United States'
+				WHEN TRIM(cntry) = '' OR cntry IS NULL THEN 'n/a'
+				ELSE TRIM(cntry)
+			END AS cntry
 		FROM bronze.erp_loc_a101;
 		SET @end_time = GETDATE();
 		PRINT '>>>Total Execution Duration (seconds):' + CAST(DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR);
 
 
-
+		-- Loading erp_px_cat_g1v2
 		SET @start_time = GETDATE();
 		PRINT '>>>Table Truncation: silver.erp_px_cat_g1v2';
 		TRUNCATE TABLE silver.erp_px_cat_g1v2;
@@ -241,10 +237,10 @@ BEGIN
 			maintenance
 		)
 		SELECT 
-			ID, 
-			CAT,
-			SUBCAT,
-			MAINTENANCE
+			id,
+			cat,
+			subcat,
+			maintenance
 		FROM bronze.erp_px_cat_g1v2;
 		SET @end_time = GETDATE();
 		PRINT '>>>Total Execution Duration (seconds):' + CAST(DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR);

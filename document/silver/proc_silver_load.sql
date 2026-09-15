@@ -61,12 +61,12 @@ BEGIN
 				WHEN cst_marital_status = 'S' THEN 'Single'
 				WHEN cst_marital_status = 'M' THEN 'Married'
 				ELSE 'n/a'
-			END AS cst_marital_status,
+			END AS cst_marital_status, --Normalize Marital Status — CASE Expression
 			CASE
 				WHEN cst_gndr = 'F' THEN 'Female'
 				WHEN cst_gndr = 'M' THEN 'Male'
 				ELSE 'n/a'
-			END AS cst_gndr,
+			END AS cst_gndr, --Normalize Gender
 			cst_create_date
 		FROM 
 		(
@@ -75,7 +75,7 @@ BEGIN
 				ROW_NUMBER() OVER (PARTITION BY cst_id ORDER BY cst_create_date DESC) AS chacking_duplicate_flag
 			FROM bronze.crm_cust_info
 		)t
-		WHERE chacking_duplicate_flag = 1;
+		WHERE chacking_duplicate_flag = 1; --Select Most Recent Record — ROW_NUMBER
 		SET @end_time = GETDATE();
 		PRINT '>>>Total Execution Duration (seconds):' + CAST(DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR);
 
@@ -98,8 +98,8 @@ BEGIN
 		)
 		SELECT
 			prd_id,
-			REPLACE(SUBSTRING(prd_key, 1, 5), '-', '_') AS cat_id,
-			SUBSTRING(prd_key, 7, LEN(prd_key)) AS prd_key,
+			REPLACE(SUBSTRING(prd_key, 1, 5), '-', '_') AS cat_id,  --Extract category ID
+			SUBSTRING(prd_key, 7, LEN(prd_key)) AS prd_key, --Extract product key
 			prd_nm,
 			COALESCE(prd_cost, 0) AS prd_cost,
 			CASE prd_line
@@ -108,9 +108,12 @@ BEGIN
 				WHEN 'S' THEN 'Sero'
 				WHEN 'T' THEN 'Tivo'
 				ELSE 'n/a'
-			END prd_line,
-			prd_start_dt,
-			prd_end_dt
+			END prd_line, --Map Product Line
+			CAST(prd_start_dt AS DATE) AS prd_start_dt,
+			CAST(
+				LEAD(prd_start_dt) OVER (PARTITION BY prd_key ORDER BY prd_start_dt) - 1 
+				AS DATE
+			) AS prd_end_dt -- Calculate end date as one day before the next start date
 		FROM bronze.crm_prd_info;
 		SET @end_time = GETDATE();
 		PRINT '>>>Total Execution Duration (seconds):' + CAST(DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR);
@@ -145,13 +148,13 @@ BEGIN
 				WHEN sls_sales IS NULL OR sls_sales != sls_quantity * ABS(sls_price)
 				THEN sls_quantity * ABS(sls_price)
 				ELSE sls_sales
-			END AS sls_sales,
+			END AS sls_sales, --Recalculate Sales — Handle Missing or Incorrect Values
 			sls_quantity,
 			CASE 
 				WHEN sls_price IS NULL OR sls_price <=0
 					THEN sls_sales / NULLIF(sls_quantity, 0)
 				ELSE sls_price
-			END AS sls_price
+			END AS sls_price-- Derive Price — Handle Invalid Values
 		FROM bronze.crm_sales_details;
 		SET @end_time = GETDATE();
 		PRINT '>>>Total Execution Duration (seconds):' + CAST(DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR);
@@ -188,7 +191,7 @@ BEGIN
 		)
 		SELECT 
 			CASE 
-				WHEN cid LIKE 'NAS%' THEN SUBSTRING(cid, 4, LEN(cid))
+				WHEN cid LIKE 'NAS%' THEN SUBSTRING(cid, 4, LEN(cid)) --Remove NAS Prefix
 				ELSE cid
 			END AS cid,
 			bdate AS bdate,
@@ -196,7 +199,7 @@ BEGIN
 				WHEN UPPER(TRIM(gen)) IN ('F', 'FEMALE') THEN 'Female'
 				WHEN UPPER(TRIM(gen)) IN ('M', 'MALE') THEN 'Male'
 				ELSE 'n/a'
-			END AS gen
+			END AS gen --Normalize Gender — Handle Unknown Values
 		FROM bronze.erp_cust_az12;
 		SET @end_time = GETDATE();
 		PRINT '>>>Total Execution Duration (seconds):' + CAST(DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR);
@@ -219,7 +222,7 @@ BEGIN
 				WHEN TRIM(cntry) IN ('US', 'USA') THEN 'United States'
 				WHEN TRIM(cntry) = '' OR cntry IS NULL THEN 'n/a'
 				ELSE TRIM(cntry)
-			END AS cntry
+			END AS cntry --Normalize Country Codes — Handle Missing Values
 		FROM bronze.erp_loc_a101;
 		SET @end_time = GETDATE();
 		PRINT '>>>Total Execution Duration (seconds):' + CAST(DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR);

@@ -74,6 +74,7 @@ BEGIN
 				*,
 				ROW_NUMBER() OVER (PARTITION BY cst_id ORDER BY cst_create_date DESC) AS chacking_duplicate_flag
 			FROM bronze.crm_cust_info
+			WHERE cst_id IS NOT NULL
 		)t
 		WHERE chacking_duplicate_flag = 1; --Select Most Recent Record — ROW_NUMBER
 		SET @end_time = GETDATE();

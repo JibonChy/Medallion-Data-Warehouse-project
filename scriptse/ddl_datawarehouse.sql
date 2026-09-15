@@ -1,3 +1,18 @@
+/*
+===========================================
+      Create Database and Schemas
+===========================================
+
+Introduction:
+    This script sets up the DataWarehouse environment from scratch.
+
+Purpose:
+    - Drop existing DataWarehouse if it exists.
+    - Create a fresh database and switch context.
+    - Define schemas: bronze (raw), silver (cleaned), gold (curated).
+*/
+
+
 ===========================================
       Create Database and Schemas
 ===========================================

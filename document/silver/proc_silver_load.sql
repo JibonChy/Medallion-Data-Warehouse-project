@@ -25,6 +25,7 @@ Execute Procedure:
 */
 
 
+
 CREATE OR ALTER PROCEDURE proc_silver_layer_loding AS
 
 BEGIN
@@ -190,7 +191,7 @@ BEGIN
 				WHEN cid LIKE 'NAS%' THEN SUBSTRING(cid, 4, LEN(cid))
 				ELSE cid
 			END AS cid,
-			btate AS bdate,
+			bdate AS bdate,
 			CASE
 				WHEN UPPER(TRIM(gen)) IN ('F', 'FEMALE') THEN 'Female'
 				WHEN UPPER(TRIM(gen)) IN ('M', 'MALE') THEN 'Male'
@@ -267,4 +268,3 @@ BEGIN
 END;
 
 EXEC proc_silver_layer_loding;
-

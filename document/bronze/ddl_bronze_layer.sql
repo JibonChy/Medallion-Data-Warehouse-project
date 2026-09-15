@@ -41,8 +41,8 @@ CREATE TABLE bronze.crm_prd_info
     prd_nm                 NVARCHAR(45),
     prd_cost               INT,
     prd_line               NVARCHAR(45),
-    prd_start_dt           DATE,
-    prd_end_dt             DATE
+    prd_start_dt           DATETIME,
+    prd_end_dt             DATETIME
 );
 
 IF OBJECT_ID('bronze.crm_sales_details', 'U') IS NOT NULL
@@ -68,9 +68,9 @@ GO
 
 CREATE TABLE bronze.erp_cust_az12
 (
-    CID                    NVARCHAR(45),
-    BDATE                  DATE,
-    GEN                    NVARCHAR(45)
+    cid                    NVARCHAR(45),
+    btate                  DATE,
+    gen                    NVARCHAR(45)
 );
 
 IF OBJECT_ID('bronze.erp_loc_a101', 'U') IS NOT NULL
@@ -79,8 +79,8 @@ GO
 
 CREATE TABLE bronze.erp_loc_a101
 (
-    CID                    NVARCHAR(45),
-    CNTRY                  NVARCHAR(45)
+    cid                    NVARCHAR(45),
+    cntry                  NVARCHAR(45)
 );
 
 IF OBJECT_ID('bronze.erp_px_cat_g1v2', 'U') IS NOT NULL
@@ -89,8 +89,8 @@ GO
 
 CREATE TABLE bronze.erp_px_cat_g1v2
 (
-    ID                     NVARCHAR(45),
-    CAT                    NVARCHAR(45),
-    SUBCAT                 NVARCHAR(45),
-    MAINTENANCE            NVARCHAR(45)
+    id                     NVARCHAR(45),
+    cat                    NVARCHAR(45),
+    subcat                 NVARCHAR(45),
+    maintenance            NVARCHAR(45)
 );
